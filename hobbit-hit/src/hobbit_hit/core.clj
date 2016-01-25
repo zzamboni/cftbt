@@ -43,6 +43,21 @@
           []
           asym-body-parts))
 
+;; Exercise 3.6
+(defn multiplied-body-parts
+  [num part]
+  (map (fn [m] 
+         {:name (clojure.string/replace (:name part) #"$" (str "-" m))
+          :size (:size part)}) (range num)))
+
+(defn multiply-body-parts
+  "Expects a seq of map that have a :name and :size, and a number of how many of each to create"
+  [num asym-body-parts]
+  (reduce (fn [final-body-parts part]
+            (into final-body-parts (multiplied-body-parts num part)))
+          []
+          asym-body-parts))
+
 ;; With loop and recurse
 (defn symmetrize-body-parts
   "Expects a seq of maps that have a :name and :size"
@@ -85,7 +100,12 @@
   ([]
    (println (str (hit asym-hobbit-body-parts better-symmetrize-body-parts))))
   ([ n & args]
-   (let [fn (if (= (first args) "alien") alienize-body-parts better-symmetrize-body-parts)]
+   (let [fn (case (first args)
+              "alien"    alienize-body-parts                               ; Alien 5-radial body, Ex. 3.5
+              "multiply" (partial multiply-body-parts                      ; Generalized multiplied body parts, Ex. 3.6
+                                  (or (parse-int (str (second args))) 1))
+              better-symmetrize-body-parts)]                               ; Regular Hobbit body
        (doseq [x (range (or (parse-int (str n)) 1))]
          (println (str (hit asym-hobbit-body-parts fn)))))))
+
 
