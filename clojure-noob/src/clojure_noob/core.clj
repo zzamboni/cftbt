@@ -118,3 +118,171 @@
   "Create a custom incrementor"
   [inc-by]
   #(+ % inc-by))
+
+;; Sequence abstractions
+
+(defn titleize
+  [topic]
+  (str topic " for the Brave and True"))
+
+(map titleize ["Hamsters" "Ragnarok"])
+
+(map titleize '("Empathy" "Decorating"))
+
+(map titleize #{"Elbows" "Soap Carving"})
+
+(map #(titleize (second %)) {:uncomfortable-thing "Winking"
+                             :foobar "Walking"})
+
+;; Seq function examples
+
+;;; map
+
+(map inc [1 2 3])
+
+(map str ["a" "b" "c"] ["A" "B" "C"])
+
+;; Passing multiple collections to map
+(def human-consumption   [8.1 7.3 6.6 5.0])
+(def critter-consumption [0.0 0.2 0.3 1.1])
+(defn unify-diet-data
+  [human critter]
+  {:human human
+   :critter critter})
+(map unify-diet-data human-consumption critter-consumption)
+
+;; Passing to map a collection of functions to apply on the same data
+(def sum #(reduce + %))
+(def avg #(/ (sum %) (count %)))
+(defn stats
+  [numbers]
+  (map #(% numbers) [sum count avg]))
+
+;; Using a keyword as the function in map
+
+(def identities
+  [{:alias "Batman"       :real "Bruce Wayne"}
+   {:alias "Spider-Man"   :real "Peter Parker"}
+   {:alias "Santa"        :real "Your mom"}
+   {:alias "Easter Bunny" :real "Your dad"}])
+
+(map :real identities)
+(map :alias identities)
+
+;; reduce
+
+;; Transforming a map
+(reduce (fn [new-map [key val]]
+          (assoc new-map key (inc val)))
+        {}
+        {:max 30 :min 10})
+
+;; Filter a map
+(reduce (fn [new-map [key val]]
+          (if (> val 4)
+            (assoc new-map key val)
+            new-map))
+        {}
+        {:human 4.1
+         :critter 3.9
+         :alien 0.0})
+
+;; Implement map using reduce
+(defn map-using-reduce
+  [fun arg]
+  (seq (reduce
+        (fn [new-seq val]
+          (conj new-seq (fun val)))
+        []
+        arg)))
+
+;; Implement filter using reduce
+(defn filter-using-reduce
+  [fun arg]
+  (seq (reduce
+        (fn [new-seq val]
+          (if (fun val)
+            (conj new-seq val)
+            new-seq))
+        []
+        arg)))
+
+(defn some-using-reduce
+  [fun arg]
+  (reduce
+   (fn [result val]
+     (or (or result (fun val)) nil))
+   nil
+   arg))
+
+(def food-journal
+  [{:month 1 :day 1 :human 5.3 :critter 2.3}
+   {:month 1 :day 2 :human 5.1 :critter 2.0}
+   {:month 2 :day 1 :human 4.9 :critter 2.1}
+   {:month 2 :day 2 :human 5.0 :critter 2.5}
+   {:month 3 :day 1 :human 4.2 :critter 3.3}
+   {:month 3 :day 2 :human 4.0 :critter 3.8}
+   {:month 4 :day 1 :human 3.7 :critter 3.9}
+   {:month 4 :day 2 :human 3.7 :critter 3.6}])
+
+(take-while #(< (:month %) 3) food-journal)
+(drop-while #(< (:month %) 3) food-journal)
+(take-while #(< (:month %) 4)
+            (drop-while #(< (:month %) 2) food-journal))
+(filter #(< (:human %) 5) food-journal)
+(=
+ (filter #(< (:human %) 5) food-journal)
+ (filter-using-reduce #(< (:human %) 5) food-journal))
+
+;; Lazy seqs
+
+(def vampire-database
+  {0 {:makes-blood-puns? false :has-pulse? true  :name "McFishwich"}
+   1 {:makes-blood-puns? false :has-pulse? true  :name "McMackson"}
+   2 {:makes-blood-puns? true  :has-pulse? false :name "Damon Salvatore"}
+   3 {:makes-blood-puns? true  :has-pulse? true  :name "Mickey Mouse"}})
+
+(defn vampire-related-details
+  [social-security-number]
+  (Thread/sleep 1000)
+  (get vampire-database social-security-number))
+
+(defn vampire?
+  [record]
+  (and (:makes-blood-puns? record)
+       (not (:has-pulse? record))
+       record))
+
+(defn identify-vampire
+  [social-security-numbers]
+  (first (filter vampire? (map vampire-related-details social-security-numbers))))
+
+(defn even-numbers
+  ([] (even-numbers 0))
+  ([n] (cons n (lazy-seq (even-numbers (+ n 2))))))
+
+(def add10 (partial + 10))
+
+(def add-missing-elements
+  (partial conj ["water" "earth" "air"]))
+
+(defn my-partial
+  [partialized-fn & args]
+  (fn [& more-args]
+    (apply partialized-fn (into args more-args))))
+
+(defn lousy-logger
+  [log-level message]
+  (condp = log-level
+    :warn (clojure.string/lower-case message)
+    :emergency (clojure.string/upper-case message)))
+
+(def warn (partial lousy-logger :warn))
+(def crit (partial lousy-logger :emergency))
+
+(def not-vampire? (complement vampire?))
+
+(defn identify-humans
+  [social-security-numbers]
+  (filter not-vampire?
+          (map vampire-related-details social-security-numbers)))
