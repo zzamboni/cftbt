@@ -286,3 +286,44 @@
   [social-security-numbers]
   (filter not-vampire?
           (map vampire-related-details social-security-numbers)))
+
+;; Functional programming
+
+(defn wisdom
+  [words]
+  (str words ", Daniel-san"))
+
+(defn year-end-evaluation
+  []
+  (if (> (rand) 0.5)
+    "You get a raise!"
+    "Better luck next year!"))
+
+(defn sum
+  ([vals] (sum vals 0))
+  ([vals accumulating-total]
+   (if (empty? vals)
+     accumulating-total
+     (sum (rest vals) (+ (first vals) accumulating-total)))))
+
+;; with recur
+(defn sum2
+  ([vals] (sum vals 0))
+  ([vals accumulating-total]
+   (if (empty? vals)
+     accumulating-total
+     (recur (rest vals) (+ (first vals) accumulating-total)))))
+
+(require '[clojure.string :as s])
+
+(defn clean
+  [text]
+  (s/replace (s/trim text) #"lol" "LOL"))
+
+(defn clean2
+  [text]
+  (-> text
+      s/trim
+      (s/replace #"lol" "LOL")))
+
+(clean "My boa constrictor is so sassy lol!     ")
