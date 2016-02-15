@@ -1,0 +1,6 @@
+[submodule "pegthing"]
+	path = pegthing
+	url = https://github.com/flyingmachine/pegthing.git
+[submodule "cftbat-code"]
+	path = cftbat-code
+	url = https://github.com/braveclojure/cftbat-code.git
