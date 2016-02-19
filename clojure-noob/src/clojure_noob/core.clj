@@ -327,3 +327,8 @@
       (s/replace #"lol" "LOL")))
 
 (clean "My boa constrictor is so sassy lol!     ")
+
+;; Chapter 6
+(in-ns 'cheese.taxonomy)
+(def cheddars ["mild" "medium" "strong" "sharp" "extra sharp"])
+(def bries ["Wisconsin" "Somerset" "Brie de Meaux" "Brie de Melun"])
