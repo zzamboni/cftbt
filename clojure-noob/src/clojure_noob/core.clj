@@ -1,5 +1,6 @@
 (ns clojure-noob.core
-  (:gen-class))
+  (:gen-class)
+  (:refer-clojure))
 
 (defn -main
   "I don't do a whole lot ... yet."
@@ -39,7 +40,7 @@
          "MIDLY INCONVENIENCED!"
          "DOOOOOMED!")))
 
-(def name "Chewbacca")
+(def chname "Chewbacca")
 
 ;; Multi-arity functions
 
@@ -329,6 +330,27 @@
 (clean "My boa constrictor is so sassy lol!     ")
 
 ;; Chapter 6
-(in-ns 'cheese.taxonomy)
+;;(in-ns 'cheese.taxonomy)
 (def cheddars ["mild" "medium" "strong" "sharp" "extra sharp"])
 (def bries ["Wisconsin" "Somerset" "Brie de Meaux" "Brie de Melun"])
+
+;; Chapter 7
+(defmacro backwards
+  [form]
+  (reverse form))
+
+(defmacro ignore-last-operand
+  [function-call]
+  (butlast function-call))
+
+(defmacro infix
+  [infixed]
+  (list (second infixed)
+        (first infixed)
+        (last infixed)))
+
+;; Chapter 8
+(macroexpand '(when boolean-expression
+                expr-1
+                expr-2
+                expr-3))
