@@ -124,3 +124,13 @@
          (handle-operator tok rest-exp outstack opstack)
          )))))
 
+(defmacro defattr
+  "Define one character attribute function"
+  [fname field]
+  `(def ~fname (comp ~field :attributes)))
+
+(defmacro defattrs
+  "Define multiple character attribute functions"
+  [& args]
+  `(do
+     ~@(map (fn [[p1 p2]] (list 'defattr p1 p2)) (partition 2 args))))
